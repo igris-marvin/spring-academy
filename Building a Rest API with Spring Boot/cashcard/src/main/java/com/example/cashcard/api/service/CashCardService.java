@@ -25,7 +25,11 @@ public class CashCardService {
 
     public Iterable<CashCard> getAllCashCard() {
 
-        Iterable<CashCard> list = null;
+        Iterable<CashCard> list = new ArrayList<CashCard>() {{
+            add(new CashCard(78L, 89.90));
+            add(new CashCard(8L, 34.67));
+            add(new CashCard(12L, 49.00));
+        }};
 
         return list;
     }

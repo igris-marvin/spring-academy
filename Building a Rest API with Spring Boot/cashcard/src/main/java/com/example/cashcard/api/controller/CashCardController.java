@@ -7,10 +7,12 @@ import com.example.cashcard.api.service.CashCardService;
 import com.example.cashcard.data.entity.CashCard;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,22 +34,28 @@ public class CashCardController {
     ) {
         
         CashCard cashCard = cardServ.getCashCard(requestedId);
-        return ResponseEntity.ok(cashCard);
-        // return ResponseEntity.notFound().build();
+
+        if(cashCard != null) {
+            return ResponseEntity.ok(cashCard);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
     
     // CREATE / POST
     @PostMapping
     private ResponseEntity<Void> postCashCard(
         @RequestBody CashCard newCashCard,
-        UriComponentsBuilder ucb
+        UriComponentsBuilder ucb,
+        Principal principal,
+        User user
     ) {
         CashCard savedCashCard = cardServ.createCashCard(newCashCard);
 
         URI locationURIOfNewCashCard = ucb
-            .path("cashcards/{id}")
-            .buildAndExpand(savedCashCard)
-            .toUri();
+                .path("cashcards/{id}")
+                .buildAndExpand(savedCashCard.getId())
+                .toUri();
 
         return ResponseEntity
                     .created(locationURIOfNewCashCard)
@@ -56,11 +64,10 @@ public class CashCardController {
 
     // READ ALL / GET ALL
     @GetMapping
-private ResponseEntity<Iterable<CashCard>> getAllCashCards(
+    private ResponseEntity<Iterable<CashCard>> getAllCashCards() {
+        
+        Iterable<CashCard> list = cardServ.getAllCashCard();
 
-) {
-    Iterable<CashCard> list = cardServ.getAllCashCard();
-
-    return ResponseEntity.ok(list);
-}
+        return ResponseEntity.ok(list);
+    }
 }
